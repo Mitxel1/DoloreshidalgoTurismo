@@ -1,0 +1,18 @@
+package mx.edu.utng.arg.doloreshidalgoturismo.data.model
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "places")
+data class PlaceEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val name: String,
+    val description: String,
+    val latitude: Double,
+    val longitude: Double,
+    val category: String,
+    val markerColor: String,
+    val isFavorite: Boolean = false,
+    val createdAt: Long = System.currentTimeMillis()
+)
