@@ -5,13 +5,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
-import androidx.compose.ui.Alignment  // ← IMPORTANTE
-import mx.edu.utng.arg.doloreshidalgoturismo.data.model.PlaceEntity
 import mx.edu.utng.arg.doloreshidalgoturismo.ui.viewmodel.MapViewModel
 import mx.edu.utng.arg.doloreshidalgoturismo.ui.components.PlacesList
 import mx.edu.utng.arg.doloreshidalgoturismo.ui.components.PlaceDialog
@@ -55,20 +54,24 @@ fun MapScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            // Mapa de Google
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState,
                 properties = MapProperties(
-                    isMyLocationEnabled = false
+                    isMyLocationEnabled = false,
+                    mapType = MapType.NORMAL
                 ),
                 uiSettings = MapUiSettings(
                     zoomControlsEnabled = true,
-                    myLocationButtonEnabled = false
+                    myLocationButtonEnabled = false,
+                    compassEnabled = true
                 ),
                 onMapLongClick = { latLng ->
                     viewModel.showAddDialog(latLng)
                 }
             ) {
+                // Dibujar marcadores
                 places.forEach { place ->
                     val position = LatLng(place.latitude, place.longitude)
                     Marker(
@@ -82,26 +85,34 @@ fun MapScreen(
                 }
             }
 
-            PlacesList(
-                places = places,
-                onPlaceClick = { place ->
-                    cameraPositionState.position = CameraPosition.fromLatLngZoom(
-                        LatLng(place.latitude, place.longitude),
-                        16f
-                    )
-                },
-                onEditClick = { place ->
-                    viewModel.showEditDialog(place)
-                },
-                onDeleteClick = { place ->
-                    viewModel.deletePlace(place)
-                },
-                onFavoriteClick = { place ->
-                    viewModel.toggleFavorite(place)
-                }
-            )
+            // Lista de lugares
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+            ) {
+                PlacesList(
+                    places = places,
+                    onPlaceClick = { place ->
+                        cameraPositionState.position = CameraPosition.fromLatLngZoom(
+                            LatLng(place.latitude, place.longitude),
+                            16f
+                        )
+                    },
+                    onEditClick = { place ->
+                        viewModel.showEditDialog(place)
+                    },
+                    onDeleteClick = { place ->
+                        viewModel.deletePlace(place)
+                    },
+                    onFavoriteClick = { place ->
+                        viewModel.toggleFavorite(place)
+                    }
+                )
+            }
         }
 
+        // Diálogo para agregar/editar
         if (showDialog) {
             PlaceDialog(
                 place = selectedPlace,
